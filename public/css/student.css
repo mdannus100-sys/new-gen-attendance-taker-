@@ -1,0 +1,35 @@
+/* student.css — extra styles for the student page only.
+   Loaded after style.css, so it can use the same colour variables. */
+
+/* Less space between the lines at the top of each module card */
+.module p { margin: 0 0 4px; }
+
+/* The big attendance % */
+.module .percent {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* ---------- List of sessions ----------
+   Date and time on the left, the badge on the right. */
+.sessions {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+.sessions li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+/* Date on the first line, time and type underneath */
+.sessions .when { display: block; font-weight: 600; }
+.sessions .details { display: block; font-size: 0.9rem; }
+
+/* "lecture" → "Lecture" */
+.sessions .type { text-transform: capitalize; }

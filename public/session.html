@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Session</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/session.css">
+  <script type="module" src="/js/session.js"></script>
+</head>
+<body class="pending">
+  <header class="topbar">
+    <span class="brand">Attendance</span>
+    <span id="who" class="who"></span>
+    <button id="logout" class="secondary small">Log out</button>
+  </header>
+  <main class="container">
+    <p><a href="/lecturer.html">← My sessions</a></p>
+
+    <!-- Errors are shown here (empty = hidden) -->
+    <p id="message" class="message" role="alert"></p>
+
+    <!-- Hidden until we know the session exists and belongs to this lecturer -->
+    <div id="content" class="hidden">
+      <div class="page-header">
+        <div>
+          <h1 id="title"></h1>
+          <p id="details" class="details muted"></p>
+        </div>
+        <!-- "Start check-in" / "Show QR code" / "Stop check-in" go here -->
+        <div id="actions" class="actions"></div>
+      </div>
+
+      <section class="card register">
+        <h2>Register</h2>
+        <p id="summary" class="summary">Loading register…</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Student ID</th>
+                <th>Status</th>
+                <th class="action">Action</th>
+              </tr>
+            </thead>
+            <!-- One row per enrolled student, filled in by session.js -->
+            <tbody id="register"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+  <script type="module" src="/js/admin.js"></script>
+</head>
+<body class="pending">
+  <header class="topbar">
+    <span class="brand">Attendance</span>
+    <span id="who" class="who"></span>
+    <button id="logout" class="secondary small">Log out</button>
+  </header>
+  <main class="container">
+    <h1>Admin</h1>
+
+    <!-- Tab bar: each button shows one of the sections below.
+         The selected tab is a filled button, the others are "secondary". -->
+    <nav class="tabs" id="tabs" aria-label="Admin sections">
+      <button type="button" data-tab="modules" aria-pressed="true">Modules</button>
+      <button type="button" data-tab="enrolments" class="secondary" aria-pressed="false">Enrolments</button>
+      <button type="button" data-tab="users" class="secondary" aria-pressed="false">Users</button>
+      <button type="button" data-tab="report" class="secondary" aria-pressed="false">Report</button>
+    </nav>
+
+    <p id="message" class="message" role="alert"></p>
+
+    <!-- ========== Modules ========== -->
+    <section id="tab-modules">
+      <div class="card">
+        <h2 id="module-form-title">Add a module</h2>
+        <form id="module-form">
+          <div class="form-grid">
+            <label>Module code
+              <input type="text" name="code" required maxlength="12" placeholder="e.g. CS101"
+                     autocapitalize="characters" autocomplete="off">
+            </label>
+            <label>Title
+              <input type="text" name="title" required maxlength="100" autocomplete="off">
+            </label>
+          </div>
+          <label>Lecturer
+            <select name="lecturerUid" required></select>
+          </label>
+          <div class="actions">
+            <button type="submit">Add module</button>
+            <button type="button" id="cancel-edit" class="secondary hidden">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>Modules</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Title</th>
+                <th>Lecturer</th>
+                <th class="num">Enrolled</th>
+                <th class="num">Sessions held</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="modules-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Enrolments ========== -->
+    <section id="tab-enrolments" class="hidden">
+      <div class="card">
+        <label>Module
+          <select id="enrol-module"></select>
+        </label>
+
+        <!-- Shown once a module is chosen -->
+        <div id="enrol-details" class="hidden">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Name</th><th>Student ID</th><th></th></tr>
+              </thead>
+              <tbody id="enrol-body"></tbody>
+            </table>
+          </div>
+          <p id="enrol-empty" class="muted hidden">No students are enrolled yet.</p>
+
+          <label for="enrol-student" class="add-label">Add student</label>
+          <div class="actions add-student">
+            <select id="enrol-student"></select>
+            <button type="button" id="enrol-add">Add student</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Users ========== -->
+    <section id="tab-users" class="hidden">
+      <div class="card">
+        <h2>Users</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Name</th><th>Email</th><th>Student ID</th><th>Role</th></tr>
+            </thead>
+            <tbody id="users-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========== Report ========== -->
+    <section id="tab-report" class="hidden">
+      <div class="page-header">
+        <h2>Attendance report</h2>
+        <button type="button" id="export-csv">Export CSV</button>
+      </div>
+
+      <div class="card">
+        <h2>By student</h2>
+        <p id="low-legend" class="muted legend"></p>
+        <div class="table-wrap">
+          <!-- The module columns depend on the data, so admin.js builds this table -->
+          <table id="by-student"></table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>By module</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Title</th>
+                <th class="num">Students enrolled</th>
+                <th class="num">Sessions held</th>
+                <th class="num">Attendance</th>
+              </tr>
+            </thead>
+            <tbody id="by-module"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,66 @@
+/* checkin.css — the page students see after scanning the QR code.
+   It is used on a phone, often in a busy lecture room, so the result is
+   ONE big card with large text and a colour you can read at a glance:
+   green = checked in, red = a problem, white = an instruction. */
+
+.result {
+  text-align: center;
+  padding: 32px 20px;
+  border-width: 2px;
+  font-size: 1.1rem;
+}
+
+.result h1 {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.result p { margin: 8px 0 0; }
+
+/* The big round symbol at the top of the card (✓, ! or i) */
+.result .icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  font-size: 2.4rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary);
+}
+
+/* Green: you are checked in */
+.result.success { background: var(--success-bg); border-color: var(--success); }
+.result.success h1 { color: var(--success); }
+.result.success .icon { background: var(--success); }
+
+/* Red: something stopped the check-in */
+.result.problem { background: var(--error-bg); border-color: var(--error); }
+.result.problem h1 { color: var(--error); }
+.result.problem .icon { background: var(--error); }
+
+/* Date / Time / Room under a successful check-in, as two columns */
+.result .details {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 16px;
+  max-width: 260px;
+  margin: 20px auto 0;
+  text-align: left;
+}
+.result .details dt { color: var(--muted); }
+.result .details dd { margin: 0; font-weight: 600; }
+
+/* Buttons inside the card are wide and tall, so they are easy to tap */
+.result .button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 14px 18px;
+  font-size: 1.1rem;
+}
+
+/* The "My attendance" link under the card */
+.bottom-link { text-align: center; }

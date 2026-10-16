@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Check-in QR code</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/qr.css">
+  <!-- qrcode-generator draws QR codes. It adds a global function called "qrcode".
+       "integrity" makes the browser refuse the file if the CDN ever changes it. -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"
+          integrity="sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script type="module" src="/js/qr.js"></script>
+</head>
+<!-- This page is shown on the classroom projector, so it is big and plain.
+     qr.css makes the top bar quiet so students look at the QR code. -->
+<body class="pending qr-page">
+  <header class="topbar">
+    <span class="brand">Attendance</span>
+    <span id="who" class="who"></span>
+    <button id="logout" class="secondary small">Log out</button>
+  </header>
+  <main class="qr-main">
+    <!-- Shown instead of the QR screen when something is wrong (qr.js fills it). -->
+    <section id="notice" class="card qr-notice hidden"></section>
+
+    <!-- The QR screen (hidden until the session is loaded). -->
+    <section id="screen" class="qr-screen hidden">
+      <div id="qr-box" class="qr-box"></div>
+
+      <div class="qr-info">
+        <h1 id="module-name"></h1>
+        <p id="room" class="qr-room"></p>
+        <p id="count" class="qr-count"></p>
+        <p id="warning" class="qr-warning" role="status"></p>
+
+        <div class="actions qr-buttons">
+          <button id="fullscreen" class="secondary small">Full screen</button>
+          <button id="stop" class="danger small">Stop check-in</button>
+          <a id="register-link" class="button secondary small hidden">Open the register</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

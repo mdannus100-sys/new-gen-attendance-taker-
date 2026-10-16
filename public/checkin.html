@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Check in</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/checkin.css">
+  <script type="module" src="/js/checkin.js"></script>
+</head>
+<!-- Students open this page by scanning the lecturer's QR code:
+     /checkin?s=SESSION_ID&t=TOKEN -->
+<body class="pending">
+  <header class="topbar">
+    <span class="brand">Attendance</span>
+    <span id="who" class="who"></span>
+    <!-- Hidden until we know someone is logged in -->
+    <button id="logout" class="secondary small hidden">Log out</button>
+  </header>
+  <main class="container narrow">
+    <!-- The one big result card. checkin.js fills it in.
+         role="status" makes screen readers read out the result. -->
+    <section id="result" class="card result" role="status">
+      <p class="muted">Checking you in…</p>
+    </section>
+
+    <!-- Shown to students only -->
+    <p id="my-attendance" class="bottom-link hidden">
+      <a href="/student.html" class="button secondary">My attendance</a>
+    </p>
+  </main>
+</body>
+</html>

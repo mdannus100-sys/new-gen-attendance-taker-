@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Lecturer</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/lecturer.css">
+  <script type="module" src="/js/lecturer.js"></script>
+</head>
+<body class="pending">
+  <header class="topbar">
+    <span class="brand">Attendance</span>
+    <span id="who" class="who"></span>
+    <button id="logout" class="secondary small">Log out</button>
+  </header>
+  <main class="container">
+    <h1>Sessions</h1>
+
+    <!-- Create a new session. lecturer.js fills the module list. -->
+    <section class="card">
+      <h2>Create a session</h2>
+      <form id="create-form">
+        <div class="form-grid">
+          <label>Module
+            <select name="moduleCode" required></select>
+          </label>
+          <label>Date
+            <input type="date" name="date" required>
+          </label>
+          <label>Start time
+            <input type="time" name="startTime" required>
+          </label>
+          <label>Room
+            <input type="text" name="room" required maxlength="50" placeholder="e.g. A101">
+          </label>
+          <label>Type
+            <select name="type" required></select>
+          </label>
+        </div>
+        <button type="submit">Create session</button>
+      </form>
+      <p id="create-message" class="message" role="status"></p>
+    </section>
+
+    <!-- All of this lecturer's sessions, newest first. -->
+    <section class="card">
+      <h2>My sessions</h2>
+      <p id="list-message" class="muted">Loading…</p>
+      <div class="table-wrap">
+        <table id="session-table" class="sessions-table hidden">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Module</th>
+              <th>Type</th>
+              <th>Room</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="session-rows"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

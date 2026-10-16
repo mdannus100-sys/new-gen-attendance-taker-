@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Student</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/student.css">
+  <script type="module" src="/js/student.js"></script>
+</head>
+<!-- "pending" hides the page until auth.js has checked this is a student -->
+<body class="pending">
+  <header class="topbar">
+    <span class="brand">Attendance</span>
+    <span id="who" class="who"></span>
+    <button id="logout" class="secondary small">Log out</button>
+  </header>
+  <main class="container narrow">
+    <h1>My attendance</h1>
+
+    <!-- Shown by student.js once we know you have modules -->
+    <p id="note" class="muted hidden">Sessions count towards your % once check-in has closed.</p>
+
+    <!-- Error message (hidden while it is empty) -->
+    <p id="message" class="message error" role="alert"></p>
+
+    <!-- student.js puts one card per module in here -->
+    <div id="modules">
+      <p class="muted">Loading…</p>
+    </div>
+  </main>
+</body>
+</html>

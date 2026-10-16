@@ -1,0 +1,117 @@
+/* qr.css — the QR screen, shown on the classroom projector.
+   It must be readable from the back of the room, so everything is big
+   and sized with "vmin": 1vmin = 1% of the SMALLER side of the screen.
+   That way it fits any screen, from a phone to a projector. */
+
+/* Plain white page: the best contrast for the QR code on a projector.
+   The page is a column: top bar, then <main> fills the rest of the screen,
+   so the QR code can sit in the middle without making the page scroll. */
+body.qr-page {
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* A quiet top bar, so students look at the QR code, not the menu.
+   It becomes normal again when the mouse is over it. */
+.qr-page .topbar {
+  background: transparent;
+  border-bottom: none;
+  opacity: 0.4;
+}
+.qr-page .topbar:hover,
+.qr-page .topbar:focus-within { opacity: 1; }
+
+.qr-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centre the QR screen from top to bottom */
+  padding: 8px 16px 24px;
+}
+
+/* ---------- QR code above the text (phones, tall screens) ---------- */
+.qr-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3vmin;
+  text-align: center;
+}
+
+/* The QR code: about 70% of the smaller side of the screen. */
+.qr-box {
+  flex: none;
+  width: 70vmin;
+  height: 70vmin;
+}
+.qr-box svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  shape-rendering: crispEdges; /* sharp squares, no thin lines between them */
+}
+
+/* Shown in place of the QR code once check-in has stopped. */
+.qr-closed {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  border: 4px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-size: clamp(1.6rem, 7vmin, 5rem);
+  font-weight: 700;
+}
+
+/* ---------- Big text ---------- */
+.qr-info h1 {
+  font-size: clamp(1.4rem, 5vmin, 3.6rem);
+  margin-bottom: 1.5vmin;
+}
+.qr-room {
+  font-size: clamp(1.2rem, 4vmin, 2.8rem);
+  margin: 0 0 3vmin;
+}
+.qr-count {
+  font-size: clamp(1.6rem, 7vmin, 5rem);
+  font-weight: 700;
+  margin: 0;
+  font-variant-numeric: tabular-nums; /* digits keep the same width as the number changes */
+}
+
+/* A small red line when a new code could not be saved. */
+.qr-warning:empty { display: none; }
+.qr-warning {
+  color: var(--error);
+  font-weight: 600;
+  margin: 2vmin 0 0;
+}
+
+/* Small buttons, out of the way below the text. */
+.qr-buttons {
+  justify-content: center;
+  margin-top: 4vmin;
+}
+
+/* Error or "check-in is closed" message instead of the QR screen. */
+.qr-notice {
+  max-width: 520px;
+  margin: 40px auto;
+  text-align: center;
+}
+.qr-notice-text { font-size: 1.2rem; font-weight: 600; }
+
+/* ---------- Wide screens (projectors, laptops): QR code left, text right ---------- */
+@media (min-aspect-ratio: 4/3) {
+  .qr-screen {
+    flex-direction: row;
+    justify-content: center;
+    gap: 6vmin;
+    text-align: left;
+  }
+  .qr-buttons { justify-content: flex-start; }
+}

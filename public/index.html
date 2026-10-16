@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attendance · Log in</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script type="module" src="/js/index.js"></script>
+</head>
+<!-- "pending" hides the page until we know if the user is already logged in -->
+<body class="pending">
+  <main class="container narrow">
+    <h1 class="app-title">University Attendance</h1>
+
+    <!-- Log in form -->
+    <section class="card" id="login-card">
+      <h2>Log in</h2>
+      <form id="login-form">
+        <label>Email
+          <input type="email" name="email" required autocomplete="email">
+        </label>
+        <label>Password
+          <input type="password" name="password" required autocomplete="current-password">
+        </label>
+        <button type="submit">Log in</button>
+      </form>
+      <p class="muted">New student? <a href="#" id="show-signup">Create an account</a></p>
+    </section>
+
+    <!-- Sign up form (hidden until "Create an account" is clicked) -->
+    <section class="card hidden" id="signup-card">
+      <h2>Create a student account</h2>
+      <form id="signup-form">
+        <label>Full name
+          <input type="text" name="name" required maxlength="100" autocomplete="name">
+        </label>
+        <label>Student ID
+          <input type="text" name="studentId" required maxlength="30">
+        </label>
+        <label>University email
+          <input type="email" name="email" required autocomplete="email">
+        </label>
+        <label>Password (at least 6 characters)
+          <input type="password" name="password" required minlength="6" autocomplete="new-password">
+        </label>
+        <button type="submit">Create account</button>
+      </form>
+      <p class="muted">Already have an account? <a href="#" id="show-login">Log in</a></p>
+    </section>
+
+    <p id="message" class="message" role="alert"></p>
+  </main>
+</body>
+</html>

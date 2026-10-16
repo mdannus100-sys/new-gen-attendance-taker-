@@ -1,0 +1,8 @@
+/* lecturer.css — the lecturer home page. */
+
+/* Keep each session on one line. On a phone the table then scrolls
+   sideways inside its box (.table-wrap) instead of squashing the text
+   into tall, hard-to-read rows. */
+.sessions-table th,
+.sessions-table td { white-space: nowrap; }
+.sessions-table .actions { flex-wrap: nowrap; }

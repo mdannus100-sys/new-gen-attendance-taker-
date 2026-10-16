@@ -1,0 +1,8 @@
+# Installed packages — anyone can get them back with "npm install"
+node_modules/
+
+# Log files written by the Firebase emulators
+*.log
+
+# Firebase CLI cache
+.firebase/

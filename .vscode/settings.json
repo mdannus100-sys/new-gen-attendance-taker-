@@ -1,0 +1,7 @@
+{
+  // VS Code "Live Server": serve the website folder (public), not the whole project.
+  "liveServer.settings.root": "/public",
+  // Open the page with this computer's Wi-Fi address (e.g. 192.168.1.23)
+  // instead of 127.0.0.1, so the QR code link also works on phones.
+  "liveServer.settings.useLocalIp": true
+}

@@ -1,0 +1,224 @@
+/* style.css — one stylesheet for the whole app.
+   Mobile first: the base styles are for phones,
+   the @media block at the bottom adds space on bigger screens. */
+
+/* ---------- Colours and sizes: change them here ---------- */
+:root {
+  --bg: #f4f6f9;
+  --surface: #ffffff;
+  --text: #1c2330;
+  --muted: #5d6878;
+  --border: #d9dee6;
+  --primary: #2350d0;
+  --primary-hover: #1b3fa6;
+  --on-primary: #ffffff;
+  --error: #b42318;
+  --error-hover: #8f1c13;
+  --error-bg: #fdecea;
+  --success: #17703a;
+  --success-bg: #e6f4ea;
+  --radius: 10px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ---------- Base ---------- */
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+h1, h2, h3 { line-height: 1.25; margin: 0 0 12px; }
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; }
+
+a { color: var(--primary); }
+
+.muted { color: var(--muted); }
+.hidden { display: none !important; }
+
+/* Pages start with class="pending" so nothing flashes on screen
+   before we know who the user is. auth.js removes it. */
+body.pending main { visibility: hidden; }
+
+/* ---------- Layout ---------- */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+}
+.container.narrow { max-width: 440px; }
+
+.app-title { text-align: center; margin: 24px 0; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+/* Top bar on logged-in pages */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.topbar .brand { font-weight: 700; }
+.topbar .who {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- Forms ---------- */
+label {
+  display: block;
+  margin-bottom: 14px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+input, select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 10px 12px;
+  font: inherit;
+  font-size: 16px; /* 16px stops iPhones zooming in on the field */
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+input:focus, select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+/* ---------- Buttons ----------
+   <a class="button"> looks the same as a <button>. */
+button, a.button {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  text-decoration: none;
+  cursor: pointer;
+}
+button:hover, a.button:hover { background: var(--primary-hover); }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+form button[type="submit"] { width: 100%; }
+
+button.secondary, a.button.secondary {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--border);
+}
+button.secondary:hover, a.button.secondary:hover { background: var(--bg); }
+
+button.danger, a.button.danger { background: var(--error); color: #fff; }
+button.danger:hover, a.button.danger:hover { background: var(--error-hover); }
+
+button.small, a.button.small { padding: 6px 12px; font-size: 0.9rem; }
+
+/* A row of buttons that wraps on small screens */
+.actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ---------- Page header: title on the left, buttons on the right ---------- */
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.page-header h1 { margin: 0; }
+
+/* Two-column form fields on bigger screens */
+.form-grid { display: grid; gap: 0 16px; }
+
+/* ---------- Tables ---------- */
+/* Wide tables scroll sideways inside their box on phones */
+.table-wrap { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+th, td {
+  text-align: left;
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+th {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+td.num, th.num { text-align: right; }
+
+/* Highlight a row or cell that is below 80% */
+tr.low td, td.low { background: var(--error-bg); }
+td.low, .low-text { color: var(--error); font-weight: 600; }
+
+/* ---------- Badges (small coloured labels) ---------- */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+.badge.present, .badge.open {
+  color: var(--success);
+  background: var(--success-bg);
+  border-color: transparent;
+}
+.badge.absent, .badge.low {
+  color: var(--error);
+  background: var(--error-bg);
+  border-color: transparent;
+}
+
+/* ---------- Messages ---------- */
+.message:empty { display: none; }
+.message {
+  padding: 12px 14px;
+  border-radius: 8px;
+}
+.message.error { color: var(--error); background: var(--error-bg); }
+.message.success { color: var(--success); background: var(--success-bg); }
+
+/* ---------- Bigger screens ---------- */
+@media (min-width: 700px) {
+  .container { padding: 32px 24px 48px; }
+  h1 { font-size: 1.9rem; }
+  .form-grid { grid-template-columns: repeat(2, 1fr); }
+}

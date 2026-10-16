@@ -1,0 +1,66 @@
+/* admin.css — extra styles for the admin page only (loaded after style.css). */
+
+/* ---------- Tab bar ---------- */
+/* The four buttons share the row and wrap on very small screens. */
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.tabs button {
+  flex: 1 1 auto;
+  padding: 8px 10px;
+}
+
+/* The message box sits between the tabs and the section */
+#message { margin: 0 0 16px; }
+
+/* While editing, the module code can't change: show it greyed out */
+input[readonly] {
+  background: var(--bg);
+  color: var(--muted);
+}
+
+/* style.css makes form submit buttons full width;
+   here the submit button shares a row with "Cancel". */
+.actions button[type="submit"] { width: auto; }
+
+/* A heading next to a button (Report tab) */
+.page-header h2 { margin: 0; }
+
+/* ---------- Selects inside tables and rows ---------- */
+td select {
+  margin: 0;
+  min-width: 120px;
+}
+
+/* "Add student": the select takes the free space, the button sits next to it */
+.add-label { margin: 16px 0 4px; }
+.add-student select {
+  flex: 1 1 200px;
+  width: auto;
+  margin: 0;
+}
+
+/* Small grey note under a disabled role select */
+.note {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.85rem;
+}
+
+/* ---------- Report ---------- */
+/* A little coloured square before "Below 80% is highlighted",
+   the same colour as the highlighted cells. */
+.legend::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 6px;
+  vertical-align: -2px;
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  border-radius: 3px;
+}

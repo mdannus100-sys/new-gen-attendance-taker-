@@ -1,0 +1,32 @@
+/* session.css — extra styles for the session page (/session).
+   Loaded after style.css. */
+
+/* Date, time, room, type and status under the title */
+.details { margin: 6px 0 0; }
+
+/* "Present 12 · Absent 18 · 30 enrolled" */
+.summary { font-weight: 600; margin: 0 0 8px; }
+
+/* "QR 09:03" / "Manual 09:10" on its own small line under the badge */
+.status-detail {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
+/* The "Mark present / Mark absent" buttons sit on the right and never wrap */
+th.action, td.action { text-align: right; white-space: nowrap; }
+
+/* Phones: a little less padding, so all four columns fit on the screen
+   and the lecturer doesn't have to scroll sideways to reach the buttons. */
+.register { padding: 16px 12px; }
+.register th, .register td { padding: 10px 4px; }
+.register button.small { padding: 6px 10px; }
+
+/* Bigger screens: back to the normal spacing from style.css */
+@media (min-width: 700px) {
+  .register { padding: 20px; }
+  .register th, .register td { padding: 10px 8px; }
+  .register button.small { padding: 6px 12px; }
+}

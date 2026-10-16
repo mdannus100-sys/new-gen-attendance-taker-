@@ -1,0 +1,292 @@
+rules_version = '2';
+
+// Firestore security rules.
+// These run on Google's servers for EVERY read and write from the app.
+// If no rule says "allow", the request is refused.
+//
+// Collections:
+//   users/{uid}                       name, email, studentId, role
+//   modules/{moduleCode}              code, title, lecturerUid
+//   enrolments/{moduleCode_uid}       studentUid, moduleCode
+//   sessions/{sessionId}              moduleCode, lecturerUid, date, startTime, room, type, status
+//   sessionTokens/{sessionId}         current, currentAt, previous, previousAt   (lecturer-only)
+//   attendance/{sessionId_uid}        sessionId, studentUid, moduleCode, lecturerUid,
+//                                     status, checkedInAt, method, token (QR only)
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ================= Helper functions =================
+
+    // Is someone logged in?
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // The role of the logged-in user, read from their users document.
+    // (The rules engine may read any document, even ones the user can't.)
+    function myRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return signedIn() && myRole() == 'admin';
+    }
+
+    function isLecturer() {
+      return signedIn() && myRole() == 'lecturer';
+    }
+
+    // Lecturers and admins count as "staff".
+    function isStaff() {
+      return signedIn() && myRole() in ['lecturer', 'admin'];
+    }
+
+    function userDoc(uid) {
+      return get(/databases/$(database)/documents/users/$(uid));
+    }
+
+    function moduleDoc(moduleCode) {
+      return get(/databases/$(database)/documents/modules/$(moduleCode));
+    }
+
+    function sessionDoc(sessionId) {
+      return get(/databases/$(database)/documents/sessions/$(sessionId));
+    }
+
+    // Enrolment IDs are "moduleCode_studentUid", so we can look one up directly.
+    function isEnrolled(moduleCode, studentUid) {
+      return exists(/databases/$(database)/documents/enrolments/$(moduleCode + '_' + studentUid));
+    }
+
+    // Does the document have exactly these fields (no more, no less)?
+    function hasExactly(data, fields) {
+      return data.keys().hasAll(fields) && data.keys().hasOnly(fields);
+    }
+
+    // ================= users/{uid} =================
+    match /users/{uid} {
+
+      // You can read your own profile.
+      // Staff can read all profiles (lecturers need student names for the register).
+      allow read: if signedIn() && (request.auth.uid == uid || isStaff());
+
+      // Sign-up: you may only create YOUR OWN profile,
+      // and the role MUST be "student".
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && hasExactly(request.resource.data, ['name', 'email', 'studentId', 'role'])
+        && request.resource.data.role == 'student'
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 100
+        && request.resource.data.studentId is string
+        && request.resource.data.studentId.size() > 0
+        && request.resource.data.studentId.size() <= 30;
+
+      // Only an admin can change a role. Nobody can change their own role.
+      // Nothing except "role" may change.
+      allow update: if isAdmin()
+        && request.auth.uid != uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['role'])
+        && request.resource.data.role in ['student', 'lecturer', 'admin'];
+
+      allow delete: if false;
+    }
+
+    // ================= modules/{moduleCode} =================
+    match /modules/{moduleCode} {
+
+      // Any logged-in user can see the module list (not secret).
+      allow read: if signedIn();
+
+      // Only admins manage modules. The document ID is the module code
+      // (2-12 capital letters or digits, e.g. CS101), and the lecturer
+      // must really be a lecturer.
+      allow create, update: if isAdmin()
+        && hasExactly(request.resource.data, ['code', 'title', 'lecturerUid'])
+        && request.resource.data.code == moduleCode
+        && moduleCode.matches('[A-Z0-9]{2,12}')
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 100
+        && userDoc(request.resource.data.lecturerUid).data.role == 'lecturer';
+
+      allow delete: if isAdmin();
+    }
+
+    // ================= enrolments/{moduleCode_uid} =================
+    match /enrolments/{enrolmentId} {
+
+      // Students can read their own enrolments; staff can read all.
+      // ("resource == null" lets a student check an enrolment that does not exist.)
+      allow get: if signedIn()
+        && (resource == null || resource.data.studentUid == request.auth.uid || isStaff());
+      allow list: if signedIn()
+        && (resource.data.studentUid == request.auth.uid || isStaff());
+
+      // Only admins enrol students. The ID must be "moduleCode_studentUid",
+      // the module must exist, and the person must be a student.
+      allow create: if isAdmin()
+        && hasExactly(request.resource.data, ['studentUid', 'moduleCode'])
+        && enrolmentId == request.resource.data.moduleCode + '_' + request.resource.data.studentUid
+        && moduleDoc(request.resource.data.moduleCode).data.code == request.resource.data.moduleCode
+        && userDoc(request.resource.data.studentUid).data.role == 'student';
+
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ================= sessions/{sessionId} =================
+    match /sessions/{sessionId} {
+
+      // Any logged-in user can read sessions (date, room, status are not secret).
+      allow read: if signedIn();
+
+      // A lecturer creates a session for one of THEIR modules.
+      // New sessions always start as "scheduled".
+      allow create: if isLecturer()
+        && hasExactly(request.resource.data,
+             ['moduleCode', 'lecturerUid', 'date', 'startTime', 'room', 'type', 'status'])
+        && request.resource.data.lecturerUid == request.auth.uid
+        && moduleDoc(request.resource.data.moduleCode).data.lecturerUid == request.auth.uid
+        && request.resource.data.status == 'scheduled'
+        && request.resource.data.type in ['lecture', 'seminar', 'lab']
+        && request.resource.data.date is string
+        && request.resource.data.date.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        && request.resource.data.startTime is string
+        && request.resource.data.startTime.matches('[0-9]{2}:[0-9]{2}')
+        && request.resource.data.room is string
+        && request.resource.data.room.size() > 0
+        && request.resource.data.room.size() <= 50;
+
+      // Only the session's lecturer can change it, and only the status,
+      // and only forwards: scheduled → open → closed.
+      allow update: if signedIn()
+        && resource.data.lecturerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && (
+          (resource.data.status == 'scheduled' && request.resource.data.status == 'open')
+          || (resource.data.status == 'open' && request.resource.data.status == 'closed')
+        );
+
+      allow delete: if false;
+    }
+
+    // ================= sessionTokens/{sessionId} =================
+    // The secret QR token. ONLY the session's lecturer can read or write it.
+    // Students never read it: the rules below read it for them when they check in.
+    match /sessionTokens/{sessionId} {
+
+      allow get: if signedIn()
+        && sessionDoc(sessionId).data.lecturerUid == request.auth.uid;
+
+      // The lecturer's QR screen writes a new token every 15 seconds:
+      //   current    = the new token
+      //   currentAt  = server time NOW (can't be faked by a wrong laptop clock)
+      //   previous / previousAt = the old current / currentAt (or null at the start)
+      allow create, update: if signedIn()
+        && sessionDoc(sessionId).data.lecturerUid == request.auth.uid
+        && sessionDoc(sessionId).data.status == 'open'
+        && hasExactly(request.resource.data, ['current', 'currentAt', 'previous', 'previousAt'])
+        && request.resource.data.current is string
+        && request.resource.data.current.size() >= 16
+        && request.resource.data.currentAt == request.time
+        && (
+          (request.resource.data.previous == null && request.resource.data.previousAt == null)
+          || (resource != null
+              && request.resource.data.previous == resource.data.current
+              && request.resource.data.previousAt == resource.data.currentAt)
+        );
+
+      // Deleted when check-in stops.
+      allow delete: if signedIn()
+        && sessionDoc(sessionId).data.lecturerUid == request.auth.uid;
+    }
+
+    // ================= attendance/{sessionId_uid} =================
+    match /attendance/{attendanceId} {
+
+      // Is `token` one of the two valid tokens for this session right now?
+      // Each token works for 30 seconds after it was created.
+      function tokenIsValid(sessionId, token) {
+        let tok = get(/databases/$(database)/documents/sessionTokens/$(sessionId)).data;
+        return token is string
+          && (
+            (token == tok.current && request.time < tok.currentAt + duration.value(30, 's'))
+            || (tok.previous != null && token == tok.previous
+                && request.time < tok.previousAt + duration.value(30, 's'))
+          );
+      }
+
+      // A STUDENT checks in by scanning the QR code.
+      function isValidQrCheckIn() {
+        let data = request.resource.data;
+        let session = sessionDoc(data.sessionId).data;
+        return signedIn()
+          && hasExactly(data, ['sessionId', 'studentUid', 'moduleCode', 'lecturerUid',
+                               'status', 'checkedInAt', 'method', 'token'])
+          // only for yourself, and the ID is fixed → only once per session
+          && data.studentUid == request.auth.uid
+          && attendanceId == data.sessionId + '_' + request.auth.uid
+          && data.method == 'qr'
+          && data.status == 'present'
+          && data.checkedInAt == request.time
+          // the session must be open and the copied fields must match it
+          && session.status == 'open'
+          && data.moduleCode == session.moduleCode
+          && data.lecturerUid == session.lecturerUid
+          // you must be enrolled in the module
+          && isEnrolled(session.moduleCode, request.auth.uid)
+          // and the token from the QR code must be valid
+          && tokenIsValid(data.sessionId, data.token);
+      }
+
+      // A LECTURER marks a student by hand (e.g. their phone is dead).
+      function isValidManualMark() {
+        let data = request.resource.data;
+        let session = sessionDoc(data.sessionId).data;
+        return signedIn()
+          && hasExactly(data, ['sessionId', 'studentUid', 'moduleCode', 'lecturerUid',
+                               'status', 'checkedInAt', 'method'])
+          && attendanceId == data.sessionId + '_' + data.studentUid
+          && session.lecturerUid == request.auth.uid
+          && data.lecturerUid == request.auth.uid
+          && data.moduleCode == session.moduleCode
+          && data.method == 'manual'
+          && data.status in ['present', 'absent']
+          && data.checkedInAt == request.time
+          && isEnrolled(session.moduleCode, data.studentUid);
+      }
+
+      // Read: the student it belongs to, the session's lecturer, or an admin.
+      // ("resource == null" lets a student check "am I already checked in?")
+      allow get: if signedIn() && (
+        resource == null
+        || resource.data.studentUid == request.auth.uid
+        || resource.data.lecturerUid == request.auth.uid
+        || isAdmin()
+      );
+      allow list: if signedIn() && (
+        resource.data.studentUid == request.auth.uid
+        || resource.data.lecturerUid == request.auth.uid
+        || isAdmin()
+      );
+
+      allow create: if isValidQrCheckIn() || isValidManualMark();
+
+      // Students can NEVER update (so a second scan is refused).
+      // The lecturer can switch present ↔ absent by hand.
+      allow update: if signedIn()
+        && resource.data.lecturerUid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['status', 'method', 'checkedInAt'])
+        && request.resource.data.status in ['present', 'absent']
+        && request.resource.data.method == 'manual'
+        && request.resource.data.checkedInAt == request.time;
+
+      allow delete: if false;
+    }
+  }
+}
